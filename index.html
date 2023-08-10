@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello Campus!</title>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        #map { height: 400px; width: 700px; }
+        html, body { height: 100%; margin: 0; padding: 0; }
+        #buttons { padding: 10px; background: #f3d1c9; }
+    </style>
+    <script src="NH_Community_Center_Areas.geojson"></script>
+    <script src="New_Hampshire_Railroads.geojson"></script>
+</head>
+<body>
+<h1>Hello Campus!</h1>
+<div id="map"></div>
+<script>
+    var railroadsLayer;
+    var railroadsVisible = false;
+    var OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, Tiles courtesy of <a href="http://hot.osm.org">HOT OSM</a>'
+    });
+
+    function lineSymbology(feature) {
+        var slope = feature.properties.Max_Slope;
+        var lineWidth = 2;
+        var lineColor = "#ald76a";
+
+        if (slope > 15.0) { lineColor = "#777777"; lineWidth = 4; }
+        if (slope > 30.0) { lineColor = "#e9a3c9"; lineWidth = 6; }
+
+        return {
+            color: lineColor,
+            weight: lineWidth,
+            opacity: 1,
+        };
+    }
+
+    var map = L.map('map', {
+        center: [43.7304, -72.2887],
+        zoom: 15,
+        layers: [OpenStreetMap_HOT]
+    });
+
+    L.geoJson(nhcc, {
+        onEachFeature: function(feature, layer) {
+            layer.bindPopup("<b>Name: " + feature.properties.NAME + "</b>");
+        }
+    }).addTo(map);
+
+    railroadsLayer = L.geoJson(nhr, {
+        style: lineSymbology,
+        onEachFeature: function(feature, layer) {
+            layer.bindPopup("<b>Name: " + feature.properties.NAME + "</b><br>" + "Avg. Slope: " +
+                feature.properties.Avg_Slope + "<br>" +
+                "Max. Slope: " +
+                feature.properties.Max_Slope);
+        }
+    }).addTo(map);
+
+    var toggleRailroadsButton = document.getElementById("toggleRailroads");
+    toggleRailroadsButton.addEventListener("click", function() {
+        if (railroadsVisible) {
+            railroadsVisible = false;
+            railroadsLayer.removeFrom(map);
+        } else {
+            railroadsVisible = true;
+            railroadsLayer.addTo(map);
+        }
+    });
+</script>
+<div id="buttons">
+    <button id="toggleRailroads">Toggle the Railroads Layer.</button>
+</div>
+</body>
+</html>
