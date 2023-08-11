@@ -10,6 +10,7 @@
         #buttons { padding: 10px; background: #f3d1c9; }
       </style>
 
+      <script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.3.0"></script>
       <script src="NH_Community_Center_Areas.geojson"></script>
       <script src="New_Hampshire_Railroads.geojson"></script>
     
@@ -51,7 +52,7 @@
                    ).addTo(map);
 
             var response = $.ajax({
-              url: "https://new-hampshire-geodata-portal-1-nhgranit.hub.arcgis.com/datasets/new-hampshire-railroads/explore",
+              url: "New_Hampshire_Railroads.geojson",
               dataType: "json",
               success: console.log("railroads data loaded!"),
               error: function(xhr) {
