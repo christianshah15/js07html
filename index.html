@@ -57,7 +57,7 @@
               success: console.log("railroads data loaded!"),
               error: function(xhr) {
                 alert(xhr.statusText);
-            });
+            }});
 
             $.when(response).done(function(){
              var railroadsLayer = L.geoJson(response.responseJSON, 
