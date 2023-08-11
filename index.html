@@ -1,84 +1,90 @@
+<!DOCTYPE html>
 <html>
-  <head>
-      <title>Hello Campus!</title>
-       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-      <style>
-        #map { height: 400px; width: 700px; }
-        html, body { height: 100%; margin: 0; padding: 0;}
-        #buttons { padding: 10px; background: #f3d1c9; }
-      </style>
+<head>
+  <title>Hello Campus!</title>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    #map { height: 400px; width: 700px; }
+    html, body { height: 100%; margin: 0; padding: 0;}
+    #buttons { padding: 10px; background: #f3d1c9; }
+  </style>
+  <script type="text/javascript" src="https://maps.stamen.com/js/tile.stamen.js?v1.3.0"></script>
+  <script src="NH_Community_Center_Areas.geojson"></script>
+  <script src="New_Hampshire_Railroads.geojson"></script>
+</head>
+<body>
+  <h1>Hello Campus!</h1>
+  <div id="map"></div>
+  <script>
+    var railroadsVisible = true;
+    var OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, Tiles courtesy of <a href="http://hot.osm.org">HOT OSM</a>'
+    });
 
-      <script type="text/javascript" src="https://maps.stamen.com/js/tile.stamen.js?v1.3.0"></script>
-      <script src="NH_Community_Center_Areas.geojson"></script>
-      <script src="New_Hampshire_Railroads.geojson"></script>
-    
+    function lineSymbology(feature) {
+      var length = feature.properties.SECT_LENGTH;
+      var lineWidth = 2;
+      var lineColor = "#ald76a";
 
-  </head>
-  <body>
-    <h1>Hello Campus!</h1>
-    <div id="map"></div>
-          <script>
-        var railroadsVisible = true;
-        var OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
-                                            { maxZoom: 19,
-                                               attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, Tiles courtesy of <a href="http://hot.osm.org">HOT OSM</a>'})
+      if (length > 15.0) { lineColor = "#777777"; lineWidth = 4; }
+      if (length > 30.0) { lineColor = "#e9a3c9"; lineWidth = 6; }
 
-            function lineSymbology(feature) {
-              var length = feature.properties.SECT_LENGTH;
-              var lineWidth = 2;
-              var lineColor = "#ald76a";
+      return {
+        color: lineColor,
+        weight: lineWidth,
+        opacity: 1,
+      };
+    }
 
-              if (length > 15.0) { lineColor = "#777777"; linewidth = 4; }
-              if (length > 30.0) { lineColor = "#e9a3c9"; linewidth = 6; }
+    var map = L.map('map', {
+      center: [43.7304, -72.2887],
+      zoom: 15,
+      layers: [OpenStreetMap_HOT]
+    });
 
-              return {
-                color: lineColor,
-                weight: lineWidth,
-                opacity: 1,
-              };
-            }
-        
-            var map = L.map('map' , {
-            center: [ 43.7304, -72.2887],
-            zoom: 15,
-            layers: [OpenStreetMap_HOT]
-                            })
-          L.geoJson(nhcc, {
-            onEachFeature: function(feature, layer) {
-              layer.bindPopup("<b>Name: " + feature.properties.NAME + "</b>");
-            }}
-                   ).addTo(map);
+    L.geoJson(nhcc, {
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup("<b>Name: " + feature.properties.NAME + "</b>");
+      }
+    }).addTo(map);
 
-            var response = $.ajax({
-              url: "New_Hampshire_Railroads.geojson",
-              dataType: "json",
-              success: console.log("railroads data loaded!"),
-              error: function(xhr) {
-                alert(xhr.statusText);
-            }});
+    var response = $.ajax({
+      url: "New_Hampshire_Railroads.geojson",
+      dataType: "json",
+      success: function() {
+        console.log("railroads data loaded!");
+      },
+      error: function(xhr) {
+        alert(xhr.statusText);
+      }
+    });
 
-            $.when(response).done(function(){
-             var railroadsLayer = L.geoJson(response.responseJSON, 
-                       { style: lineSymbology,
-            onEachFeature: function(feature, layer) {
-              layer.bindPopup("<b>Name: " + feature.properties.NAME + "</b><br>" + "Avg. SECT_LENGTH: " +
-                             feature.properties.SECT_LENGTH + "<br>");
-            }
-                       }).addTo(map);
-            $("#toggleRailroads").show();
-            $("#toggleRailroads").click( function() {
-              if (railroadsVisible) {
-                railroadsVisible = false;
-                railroadsLayer.removeFrom(map);
-              } else {
-                  railroadsVisible = true;
-                  railroadsLayer.addTo(map);
-            }});
-      </script>
-    <div id="buttons">
-      <button id="toggleRailroads" hidden>Toggle the Railroads Layer.</button>
-    </div>
-  </body>
+    $.when(response).done(function() {
+      var railroadsLayer = L.geoJson(response.responseJSON, {
+        style: lineSymbology,
+        onEachFeature: function(feature, layer) {
+          layer.bindPopup("<b>Name: " + feature.properties.NAME + "</b><br>" + "Avg. SECT_LENGTH: " +
+                          feature.properties.SECT_LENGTH + "<br>");
+        }
+      }).addTo(map);
+
+      $("#toggleRailroads").show();
+      $("#toggleRailroads").click(function() {
+        if (railroadsVisible) {
+          railroadsVisible = false;
+          map.removeLayer(railroadsLayer);
+        } else {
+          railroadsVisible = true;
+          railroadsLayer.addTo(map);
+        }
+      });
+    });
+  </script>
+  <div id="buttons">
+    <button id="toggleRailroads" hidden>Toggle the Railroads Layer.</button>
+  </div>
+</body>
 </html>
