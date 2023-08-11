@@ -30,8 +30,8 @@
               var lineWidth = 2;
               var lineColor = "#ald76a";
 
-              if (length > 15.0) { lineColor = "#777777"; linewidth = 4;}
-              if (length > 30.0) { lineColor = "#e9a3c9"; linewidth = 6;}
+              if (length > 15.0) { lineColor = "#777777"; linewidth = 4; }
+              if (length > 30.0) { lineColor = "#e9a3c9"; linewidth = 6; }
 
               return {
                 color: lineColor,
@@ -67,7 +67,7 @@
                              feature.properties.SECT_LENGTH + "<br>");
             }
                        }).addTo(map);
-            $("toggleRailroads").show();
+            $("#toggleRailroads").show();
             $("#toggleRailroads").click( function() {
               if (railroadsVisible) {
                 railroadsVisible = false;
