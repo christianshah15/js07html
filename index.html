@@ -52,7 +52,7 @@
     }).addTo(map);
 
     var response = $.ajax({
-      url: "New_Hampshire_Railroads.geojson",
+      url: "https://new-hampshire-geodata-portal-1-nhgranit.hub.arcgis.com/datasets/new-hampshire-railroads/explore",
       dataType: "json",
       success: function() {
         console.log("railroads data loaded!");
